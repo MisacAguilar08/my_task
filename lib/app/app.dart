@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_task/app/pages/splash/splash_page.dart';
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -18,10 +17,21 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: primary),
         scaffoldBackgroundColor: backgroundColor,
         textTheme: Theme.of(context).textTheme.apply(
-          fontFamily: 'Poppins',
-          bodyColor: textColor,
-          displayColor: textColor
-        ),
+            fontFamily: 'Poppins',
+            bodyColor: textColor,
+            displayColor: textColor),
+        bottomSheetTheme:
+            BottomSheetThemeData(backgroundColor: Colors.transparent),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 54),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+            textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700
+            ))),
         useMaterial3: true,
       ),
       home: const SplashPage(),
