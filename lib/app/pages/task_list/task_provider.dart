@@ -25,4 +25,9 @@ class TaskProvider extends ChangeNotifier{
     _taskRepository.addTask(task);
     fetchTasks();
   }
+
+  void deleteTask(Task task){
+    _taskRepository.deleteTask(task);
+    fetchTasks();
+  }
 }
