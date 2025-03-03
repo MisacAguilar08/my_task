@@ -26,11 +26,10 @@ class TaskList extends StatelessWidget {
           ],
         ),
         floatingActionButton: Builder(
-          builder: (context) => FloatingActionButton(
-              onPressed: () => _showNewTaskModal(context),
-              child: Icon(Icons.add),
-            )
-        ),
+            builder: (context) => FloatingActionButton(
+                  onPressed: () => _showNewTaskModal(context),
+                  child: Icon(Icons.add),
+                )),
       ),
     );
   }
@@ -38,7 +37,10 @@ class TaskList extends StatelessWidget {
   void _showNewTaskModal(BuildContext context) {
     showModalBottomSheet(
         context: context,
-        builder: (_) => ChangeNotifierProvider.value(value: context.read<TaskProvider>(), child: _NewTaskModal(),));
+        builder: (_) => ChangeNotifierProvider.value(
+              value: context.read<TaskProvider>(),
+              child: _NewTaskModal(),
+            ));
   }
 }
 
@@ -78,8 +80,10 @@ class _NewTaskModal extends StatelessWidget {
           ),
           ElevatedButton(
               onPressed: () {
-                if (_controller.text.isNotEmpty) {
-                  final task = Task(_controller.text);
+                if (_controller.text.isNotEmpty &&
+                    _controller.text.toString().trim().length != 0) {
+                  final idTask = DateTime.timestamp();
+                  final task = Task(idTask.toString(), _controller.text);
                   context.read<TaskProvider>().addTask(task);
                   Navigator.of(context).pop();
                 }
@@ -115,12 +119,17 @@ class _TaskList extends StatelessWidget {
 
                 return ListView.separated(
                     itemBuilder: (_, index) => _taskItem(
-                      task: provider.taskList[index],
-                      onTap: () => provider.onTaskDoneChange(provider.taskList[index]),
-                    ),
+                          task: provider.taskList[index],
+                          onTap: (_) => {
+                            provider.onTaskDoneChange(provider.taskList[index])
+                          },
+                          onDelete: () {
+                            provider.deleteTask(provider.taskList[index]);
+                          },
+                        ),
                     separatorBuilder: (_, __) => const SizedBox(
-                      height: 16,
-                    ),
+                          height: 16,
+                        ),
                     itemCount: provider.taskList.length);
               },
             ),
@@ -182,35 +191,37 @@ class _Header extends StatelessWidget {
 }
 
 class _taskItem extends StatelessWidget {
-  const _taskItem({super.key, required this.task, this.onTap});
+  const _taskItem({super.key, required this.task, this.onTap, this.onDelete});
 
   final Task task;
-  final VoidCallback? onTap;
+  final ValueChanged? onTap;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 18),
-            child: Row(
-              children: [
-                Icon(
-                  task.done
-                      ? Icons.check_box_rounded
-                      : Icons.check_box_outline_blank,
-                  color: Theme.of(context).colorScheme.primary,
+    return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 18),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Checkbox(value: task.done, onChanged: onTap),
+              SizedBox(
+                width: 10,
+              ),
+              Text(task.title),
+              MaterialButton(
+                onPressed: onDelete,
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Text(task.title),
-              ],
-            ),
-          )),
-    );
+              ),
+              // MaterialButton(onPressed: (){},
+              //   child: Icon(Icons.edit, color: Colors.red,),),
+            ],
+          ),
+        ));
   }
 }
