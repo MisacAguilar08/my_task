@@ -32,20 +32,24 @@ class SplashPage extends StatelessWidget {
             text: 'Lista de Tareas',
           ),
           SizedBox(height: 21),
-          GestureDetector(
-            onTap: () {
-              print("Click navegator");
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return TaskList();
-              }));
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32),
-              child: Text(
-                  textAlign: TextAlign.center,
-                  'La mejor forma para que no se te olvide nada es anotarlo. Guardar tus tareas y ve completando poco a poco para aumentar tu productividad'),
-            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+                textAlign: TextAlign.center,
+                'La mejor forma para que no se te olvide nada es anotarlo. Guardar tus tareas y ve completando poco a poco para aumentar tu productividad'),
           ),
+          Expanded(child: Container()),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return TaskList();
+                  }));
+                },
+                child: Text("Mis tareas")),
+          )
         ],
       ),
     );

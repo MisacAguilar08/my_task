@@ -1,13 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
-import 'package:my_task/app/repository/task_repository.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../widgtes/images_task_list.dart';
 
 class TaskList extends StatelessWidget {
@@ -18,6 +13,7 @@ class TaskList extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => TaskProvider()..fetchTasks(),
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -26,22 +22,33 @@ class TaskList extends StatelessWidget {
           ],
         ),
         floatingActionButton: Builder(
-            builder: (context) => FloatingActionButton(
-                  onPressed: () => _showNewTaskModal(context),
-                  child: Icon(Icons.add),
+            builder: (context) => SizedBox(
+                  width: 45,
+                  height: 45,
+                  child: FloatingActionButton(
+                    onPressed: () => _showNewTaskModal(context),
+                    child: Icon(Icons.add),
+                  ),
                 )),
       ),
     );
   }
+}
 
-  void _showNewTaskModal(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (_) => ChangeNotifierProvider.value(
+void _showNewTaskModal(BuildContext context) {
+  showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (_) => SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom:
+                  MediaQuery.of(context).viewInsets.bottom, // Ajusta al teclado
+            ),
+            child: ChangeNotifierProvider.value(
               value: context.read<TaskProvider>(),
               child: _NewTaskModal(),
-            ));
-  }
+            ),
+          ));
 }
 
 class _NewTaskModal extends StatelessWidget {
@@ -137,16 +144,22 @@ class _TaskList extends StatelessWidget {
                             provider.deleteTask(provider.taskList[index]);
                           },
                           onEdit: () {
-                            print('Click edit');
                             showModalBottomSheet(
+                                isScrollControlled: true,
                                 context: context,
-                                builder: (_) => ChangeNotifierProvider.value(
-                                      value: context.read<TaskProvider>(),
-                                      child: _NewTaskModal(
-                                        editTask: provider.taskList[index],
+                                builder: (_) => SingleChildScrollView(
+                                      padding: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom, // Ajusta el modal al teclado
+                                      ),
+                                      child: ChangeNotifierProvider.value(
+                                        value: context.read<TaskProvider>(),
+                                        child: _NewTaskModal(
+                                          editTask: provider.taskList[index],
+                                        ),
                                       ),
                                     ));
-                            print(provider.taskList[index]);
                           },
                         ),
                     separatorBuilder: (_, __) => const SizedBox(
