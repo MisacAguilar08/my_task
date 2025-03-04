@@ -45,12 +45,15 @@ class TaskList extends StatelessWidget {
 }
 
 class _NewTaskModal extends StatelessWidget {
-  _NewTaskModal({super.key});
+  _NewTaskModal({super.key, this.editTask});
 
-  final _controller = TextEditingController();
+  final Task? editTask;
 
   @override
   Widget build(BuildContext context) {
+    final _controller =
+        TextEditingController(text: editTask == null ? "" : editTask?.title);
+
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.vertical(top: Radius.circular(21)),
@@ -82,9 +85,16 @@ class _NewTaskModal extends StatelessWidget {
               onPressed: () {
                 if (_controller.text.isNotEmpty &&
                     _controller.text.toString().trim().length != 0) {
-                  final idTask = DateTime.timestamp();
-                  final task = Task(idTask.toString(), _controller.text);
-                  context.read<TaskProvider>().addTask(task);
+                  if (editTask == null) {
+                    final idTask = DateTime.timestamp();
+                    final task = Task(idTask.toString(), _controller.text);
+                    context.read<TaskProvider>().addTask(task);
+                  } else {
+                    final task = Task(editTask!.idTask, _controller.text,
+                        done: editTask!.done);
+                    context.read<TaskProvider>().editTask(task);
+                  }
+
                   Navigator.of(context).pop();
                 }
               },
@@ -125,6 +135,18 @@ class _TaskList extends StatelessWidget {
                           },
                           onDelete: () {
                             provider.deleteTask(provider.taskList[index]);
+                          },
+                          onEdit: () {
+                            print('Click edit');
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (_) => ChangeNotifierProvider.value(
+                                      value: context.read<TaskProvider>(),
+                                      child: _NewTaskModal(
+                                        editTask: provider.taskList[index],
+                                      ),
+                                    ));
+                            print(provider.taskList[index]);
                           },
                         ),
                     separatorBuilder: (_, __) => const SizedBox(
@@ -191,35 +213,53 @@ class _Header extends StatelessWidget {
 }
 
 class _taskItem extends StatelessWidget {
-  const _taskItem({super.key, required this.task, this.onTap, this.onDelete});
+  const _taskItem(
+      {super.key, required this.task, this.onTap, this.onDelete, this.onEdit});
 
   final Task task;
   final ValueChanged? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Checkbox(value: task.done, onChanged: onTap),
+              Container(
+                  width: 30,
+                  child: Checkbox(value: task.done, onChanged: onTap)),
               SizedBox(
                 width: 10,
               ),
-              Text(task.title),
-              MaterialButton(
-                onPressed: onDelete,
-                child: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
+              Expanded(
+                child: Text(task.title),
+              ),
+              GestureDetector(
+                onTap: onEdit,
+                child: Container(
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                  ),
                 ),
               ),
-              // MaterialButton(onPressed: (){},
-              //   child: Icon(Icons.edit, color: Colors.red,),),
+              SizedBox(
+                width: 15,
+              ),
+              GestureDetector(
+                onTap: onDelete,
+                child: Container(
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
             ],
           ),
         ));

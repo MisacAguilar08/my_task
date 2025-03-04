@@ -30,4 +30,15 @@ class TaskRepository {
     jsonTasks.remove(jsonEncode(task.toJson()));
     return prefs.setStringList('tasks', jsonTasks);
   }
+
+  Future<bool> editTask(Task task) async{
+    final prefs = await SharedPreferences.getInstance();
+    final jsonTasks = prefs.getStringList('tasks') ?? [];
+    List<Task> jTask = jsonTasks.map((e) => Task.fromJson(jsonDecode(e))).toList();
+    final index = jTask.indexWhere( (item) => item.idTask == task.idTask);
+    jTask[index].title = task.title;
+    final encodeTasks = jTask.map((e) => jsonEncode(e.toJson())).toList();
+    return prefs.setStringList('tasks', encodeTasks);
+
+  }
 }

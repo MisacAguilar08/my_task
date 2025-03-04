@@ -7,8 +7,8 @@ class Task{
     done= json["done"];
   }
 
-  late final String idTask;
-  late final String title;
+  late String idTask;
+  late String title;
   late bool done;
 
   Map<String, dynamic> toJson(){
