@@ -5,9 +5,14 @@ import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
 import '../../widgtes/images_task_list.dart';
 
-class TaskList extends StatelessWidget {
+class TaskList extends StatefulWidget {
   const TaskList({super.key});
 
+  @override
+  State<TaskList> createState() => _TaskListState();
+}
+
+class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -35,31 +40,52 @@ class TaskList extends StatelessWidget {
   }
 }
 
-void _showNewTaskModal(BuildContext context) {
+void _showNewTaskModal(BuildContext context, {Task? editTask}) {
   showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (_) => SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom:
-                  MediaQuery.of(context).viewInsets.bottom, // Ajusta al teclado
-            ),
-            child: ChangeNotifierProvider.value(
-              value: context.read<TaskProvider>(),
-              child: _NewTaskModal(),
-            ),
-          ));
+    isScrollControlled: true,
+    context: context,
+    builder: (_) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom, // Ajuste dinámico
+        ),
+        child: ChangeNotifierProvider.value(
+          value: context.read<TaskProvider>(),
+          child: _NewTaskModal(editTask: editTask),
+        ),
+      );
+    },
+  );
 }
 
-class _NewTaskModal extends StatelessWidget {
+class _NewTaskModal extends StatefulWidget {
   _NewTaskModal({super.key, this.editTask});
 
   final Task? editTask;
 
   @override
+  State<_NewTaskModal> createState() => _NewTaskModalState();
+}
+
+class _NewTaskModalState extends State<_NewTaskModal> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: widget.editTask?.title ?? "",
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _controller =
-        TextEditingController(text: editTask == null ? "" : editTask?.title);
 
     return Container(
       decoration: BoxDecoration(
@@ -79,6 +105,7 @@ class _NewTaskModal extends StatelessWidget {
           TextField(
             controller: _controller,
             decoration: InputDecoration(
+              hintMaxLines: 8,
                 filled: true,
                 fillColor: Colors.white,
                 border:
@@ -90,16 +117,18 @@ class _NewTaskModal extends StatelessWidget {
           ),
           ElevatedButton(
               onPressed: () {
-                if (_controller.text.isNotEmpty &&
-                    _controller.text.toString().trim().length != 0) {
-                  if (editTask == null) {
-                    final idTask = DateTime.timestamp();
-                    final task = Task(idTask.toString(), _controller.text);
-                    context.read<TaskProvider>().addTask(task);
+                final taskTitle = _controller.text.trim();
+                if (taskTitle.isNotEmpty) {
+                  final newTask = Task(
+                    widget.editTask?.idTask ?? DateTime.timestamp().toString(),
+                    taskTitle,
+                    done: widget.editTask?.done ?? false,
+                  );
+
+                  if (widget.editTask == null) {
+                    context.read<TaskProvider>().addTask(newTask);
                   } else {
-                    final task = Task(editTask!.idTask, _controller.text,
-                        done: editTask!.done);
-                    context.read<TaskProvider>().editTask(task);
+                    context.read<TaskProvider>().editTask(newTask);
                   }
 
                   Navigator.of(context).pop();
@@ -143,24 +172,8 @@ class _TaskList extends StatelessWidget {
                           onDelete: () {
                             provider.deleteTask(provider.taskList[index]);
                           },
-                          onEdit: () {
-                            showModalBottomSheet(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (_) => SingleChildScrollView(
-                                      padding: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                            .viewInsets
-                                            .bottom, // Ajusta el modal al teclado
-                                      ),
-                                      child: ChangeNotifierProvider.value(
-                                        value: context.read<TaskProvider>(),
-                                        child: _NewTaskModal(
-                                          editTask: provider.taskList[index],
-                                        ),
-                                      ),
-                                    ));
-                          },
+                          onEdit: () =>
+                            _showNewTaskModal(context, editTask: provider.taskList[index]),
                         ),
                     separatorBuilder: (_, __) => const SizedBox(
                           height: 16,
