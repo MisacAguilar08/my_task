@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_task/app/pages/task_list/task_list_page.dart';
+import 'package:my_task/app/utils/app_images.dart';
 
+import '../../utils/app_texts.dart';
 import '../../widgtes/images_task_list.dart';
 import '../../widgtes/title_task_list.dart';
 
@@ -9,49 +11,67 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double sizeH = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Column(
         children: [
-          Row(
-            children: [
-              ImagesTaskList(
-                nameImages: "shape",
-                imageWidth: 141,
-                imageHeight: 129,
-              ),
-            ],
-          ),
-          SizedBox(height: 79),
-          ImagesTaskList(
-            nameImages: "onboarding-image",
-            imageWidth: 180,
-            imageHeight: 168,
-          ),
-          SizedBox(height: 99),
-          TitleTaskList(
-            text: 'Lista de Tareas',
-          ),
-          SizedBox(height: 21),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32),
-            child: Text(
-                textAlign: TextAlign.center,
-                'La mejor forma para que no se te olvide nada es anotarlo. Guardar tus tareas y ve completando poco a poco para aumentar tu productividad'),
-          ),
+          Header(),
+          SizedBox(height: sizeH * .05),
+          ImagesTask(),
+          SizedBox(height: sizeH * .075),
+          TitleTask(),
+          SizedBox(height: sizeH * .018),
+          DescriptionTask(),
           Expanded(child: Container()),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-            child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) {
-                    return TaskList();
-                  }));
-                },
-                child: Text("Mis tareas")),
-          )
+          ButtonTask(context),
         ],
       ),
+    );
+  }
+
+  Padding ButtonTask(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+      child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return TaskList();
+            }));
+          },
+          child: Text(AppTexts.titleButton)),
+    );
+  }
+
+  Widget DescriptionTask() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 32),
+      child: Text(textAlign: TextAlign.center, AppTexts.splashDescription),
+    );
+  }
+
+  Widget TitleTask() {
+    return TitleTaskList(
+      text: AppTexts.splashTitle,
+    );
+  }
+
+  Widget ImagesTask() {
+    return ImagesTaskList(
+      nameImages: AppImages.splashOnboarding,
+      imageWidth: 180,
+      imageHeight: 168,
+    );
+  }
+
+  Widget Header() {
+    return Row(
+      children: [
+        ImagesTaskList(
+          nameImages: AppImages.splashShape,
+          imageWidth: 141,
+          imageHeight: 129,
+        ),
+      ],
     );
   }
 }

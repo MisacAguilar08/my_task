@@ -3,6 +3,7 @@ import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../../services/note_service.dart';
 import '../../widgtes/images_task_list.dart';
 
@@ -75,38 +76,22 @@ class _NewTaskModalState extends State<_NewTaskModal> {
   @override
   void initState() {
     super.initState();
-    // getNote();
-    // print(lst);
     _controller = TextEditingController(
       text: widget.editTask?.title ?? "",
     );
   }
 
-  void addNote(String date, bool statusDone) async {
+  void addNote(String id, String date, bool statusDone) async {
     String title = _controller.text;
-
     if (title.isNotEmpty) {
-      await notesService.addNote(date, title, statusDone);
+      await notesService.addNote(id, title, statusDone, date);
       _controller.clear();
     }
 
   }
 
-  void getNote() async{
-    List<Map<String, dynamic>> notes = await notesService.getNotes();
-
-    for (var note in notes) {
-      print('ID: ${note}');
-      print('ID: ${note['id']}');
-      print('Contenido: ${note['content']}');
-      print('Fecha: ${note['createdAt']}');
-      print('-------------------');
-      }
-  }
-
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -144,10 +129,11 @@ class _NewTaskModalState extends State<_NewTaskModal> {
           ElevatedButton(
               onPressed: () {
                 final taskTitle = _controller.text.trim();
+                var uuid = Uuid();
                 if (taskTitle.isNotEmpty) {
                   String timeStamp = widget.editTask?.date ?? DateTime.timestamp().toString();
                   bool status = widget.editTask?.done ?? false;
-                  String id = widget.editTask?.id ?? timeStamp;
+                  String id = widget.editTask?.id ?? uuid.v4();
                   final newTask = Task(
                     timeStamp,
                     taskTitle,
@@ -157,10 +143,10 @@ class _NewTaskModalState extends State<_NewTaskModal> {
 
                   if (widget.editTask == null) {
                     context.read<TaskProvider>().addTask(newTask);
-                    addNote(timeStamp, status);
+                    addNote(id, timeStamp, status);
                   } else {
                     context.read<TaskProvider>().editTask(newTask);
-                    addNote(timeStamp, status);
+                    addNote(id, timeStamp, status);
                   }
 
                   Navigator.of(context).pop();
@@ -174,10 +160,19 @@ class _NewTaskModalState extends State<_NewTaskModal> {
 }
 
 class _TaskList extends StatelessWidget {
-  const _TaskList({
+  final NotesService notesService = NotesService();
+
+  _TaskList({
     super.key,
   });
 
+  void deleteNote(String id) async {
+    await notesService.deleteNote(id);
+  }
+
+  void updateNoteCheck(String id, bool check) async {
+      await notesService.updateNoteDone(id, check);
+  }
 
 
   @override
@@ -200,14 +195,19 @@ class _TaskList extends StatelessWidget {
                 return ListView.separated(
                     itemBuilder: (_, index) => _taskItem(
                           task: provider.taskList[index],
-                          onTap: (_) => {
-                            provider.onTaskDoneChange(provider.taskList[index])
+                          onTap: (_)  async{
+                            provider.onTaskDoneChange(provider.taskList[index]);
+                            print("Click");
+                            updateNoteCheck(provider.taskList[index].id, provider.taskList[index].done);
                           },
                           onDelete: () {
                             provider.deleteTask(provider.taskList[index]);
+                            deleteNote(provider.taskList[index].id);
+
                           },
-                          onEdit: () =>
-                            _showNewTaskModal(context, editTask: provider.taskList[index]),
+                          onEdit: () {
+                            _showNewTaskModal(context, editTask: provider.taskList[index]);
+                          }
                         ),
                     separatorBuilder: (_, __) => const SizedBox(
                           height: 16,
