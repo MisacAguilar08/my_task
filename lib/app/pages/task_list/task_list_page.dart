@@ -3,6 +3,7 @@ import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
+import '../../services/note_service.dart';
 import '../../widgtes/images_task_list.dart';
 
 class TaskList extends StatefulWidget {
@@ -68,14 +69,39 @@ class _NewTaskModal extends StatefulWidget {
 }
 
 class _NewTaskModalState extends State<_NewTaskModal> {
+  final NotesService notesService = NotesService();
   late TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
+    // getNote();
+    // print(lst);
     _controller = TextEditingController(
       text: widget.editTask?.title ?? "",
     );
+  }
+
+  void addNote(String date, bool statusDone) async {
+    String title = _controller.text;
+
+    if (title.isNotEmpty) {
+      await notesService.addNote(date, title, statusDone);
+      _controller.clear();
+    }
+
+  }
+
+  void getNote() async{
+    List<Map<String, dynamic>> notes = await notesService.getNotes();
+
+    for (var note in notes) {
+      print('ID: ${note}');
+      print('ID: ${note['id']}');
+      print('Contenido: ${note['content']}');
+      print('Fecha: ${note['createdAt']}');
+      print('-------------------');
+      }
   }
 
   @override
@@ -119,16 +145,22 @@ class _NewTaskModalState extends State<_NewTaskModal> {
               onPressed: () {
                 final taskTitle = _controller.text.trim();
                 if (taskTitle.isNotEmpty) {
+                  String timeStamp = widget.editTask?.date ?? DateTime.timestamp().toString();
+                  bool status = widget.editTask?.done ?? false;
+                  String id = widget.editTask?.id ?? timeStamp;
                   final newTask = Task(
-                    widget.editTask?.idTask ?? DateTime.timestamp().toString(),
+                    timeStamp,
                     taskTitle,
-                    done: widget.editTask?.done ?? false,
+                    done: status,
+                    id: id
                   );
 
                   if (widget.editTask == null) {
                     context.read<TaskProvider>().addTask(newTask);
+                    addNote(timeStamp, status);
                   } else {
                     context.read<TaskProvider>().editTask(newTask);
+                    addNote(timeStamp, status);
                   }
 
                   Navigator.of(context).pop();
@@ -145,6 +177,8 @@ class _TaskList extends StatelessWidget {
   const _TaskList({
     super.key,
   });
+
+
 
   @override
   Widget build(BuildContext context) {

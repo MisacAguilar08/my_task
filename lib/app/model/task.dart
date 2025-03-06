@@ -1,21 +1,24 @@
 class Task{
-  Task(this.idTask, this.title, {this.done = false});
+  Task(this.date, this.title, {this.done = false, this.id = ""});
 
   Task.fromJson(Map<String, dynamic> json){
-    idTask= json["idTask"];
+    id= json["id"];
     title= json["title"];
+    date= json["date"];
     done= json["done"];
   }
 
-  late String idTask;
+  late String id;
+  late String date;
   late String title;
   late bool done;
 
   Map<String, dynamic> toJson(){
     return{
-      "idTask": idTask,
+      "id": id,
       "title": title,
-      "done": done
+      "done": done,
+      "date": date
     };
   }
 }

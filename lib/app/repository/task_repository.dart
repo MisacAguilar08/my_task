@@ -14,7 +14,9 @@ class TaskRepository {
 
   Future<List<Task>> getTasks() async {
     final prefs = await SharedPreferences.getInstance();
+    // prefs.remove("tasks");
     final jsonTasks = prefs.getStringList('tasks') ?? [];
+    print(jsonTasks);
     return jsonTasks.map((e) => Task.fromJson(jsonDecode(e))).toList();
   }
 
@@ -35,7 +37,7 @@ class TaskRepository {
     final prefs = await SharedPreferences.getInstance();
     final jsonTasks = prefs.getStringList('tasks') ?? [];
     List<Task> jTask = jsonTasks.map((e) => Task.fromJson(jsonDecode(e))).toList();
-    final index = jTask.indexWhere( (item) => item.idTask == task.idTask);
+    final index = jTask.indexWhere( (item) => item.id == task.id);
     jTask[index].title = task.title;
     final encodeTasks = jTask.map((e) => jsonEncode(e.toJson())).toList();
     return prefs.setStringList('tasks', encodeTasks);
