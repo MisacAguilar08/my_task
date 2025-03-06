@@ -57,7 +57,7 @@ class SplashPage extends StatelessWidget {
 
   Widget ImagesTask() {
     return ImagesTaskList(
-      nameImages: AppImages.splashOnboarding,
+      nameImages: AppImages.onboarding,
       imageWidth: 180,
       imageHeight: 168,
     );
@@ -67,7 +67,7 @@ class SplashPage extends StatelessWidget {
     return Row(
       children: [
         ImagesTaskList(
-          nameImages: AppImages.splashShape,
+          nameImages: AppImages.shape,
           imageWidth: 141,
           imageHeight: 129,
         ),

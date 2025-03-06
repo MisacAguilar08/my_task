@@ -1,5 +1,5 @@
 class AppImages{
-
-  static const splashShape = "shape";
-  static const splashOnboarding = "onboarding-image";
+  static const shape = "shape";
+  static const onboarding = "onboarding-image";
+  static const taskList= "tasks-list-image";
 }

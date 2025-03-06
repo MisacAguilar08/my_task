@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
+import 'package:my_task/app/utils/app_images.dart';
+import 'package:my_task/app/utils/app_texts.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -28,17 +30,21 @@ class _TaskListState extends State<TaskList> {
             Expanded(child: _TaskList()),
           ],
         ),
-        floatingActionButton: Builder(
-            builder: (context) => SizedBox(
-                  width: 45,
-                  height: 45,
-                  child: FloatingActionButton(
-                    onPressed: () => _showNewTaskModal(context),
-                    child: Icon(Icons.add),
-                  ),
-                )),
+        floatingActionButton: buildModalTaskList(),
       ),
     );
+  }
+
+  Builder buildModalTaskList() {
+    return Builder(
+        builder: (context) => SizedBox(
+              width: 45,
+              height: 45,
+              child: FloatingActionButton(
+                onPressed: () => _showNewTaskModal(context),
+                child: Icon(Icons.add),
+              ),
+            ));
   }
 }
 
@@ -87,7 +93,6 @@ class _NewTaskModalState extends State<_NewTaskModal> {
       await notesService.addNote(id, title, statusDone, date);
       _controller.clear();
     }
-
   }
 
   @override
@@ -97,7 +102,6 @@ class _NewTaskModalState extends State<_NewTaskModal> {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.vertical(top: Radius.circular(21)),
@@ -108,7 +112,7 @@ class _NewTaskModalState extends State<_NewTaskModal> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TitleTaskList(
-            text: 'Nueva Tarea',
+            text: AppTexts.taskListModalTitle,
           ),
           SizedBox(
             height: 26,
@@ -116,12 +120,12 @@ class _NewTaskModalState extends State<_NewTaskModal> {
           TextField(
             controller: _controller,
             decoration: InputDecoration(
-              hintMaxLines: 8,
+                hintMaxLines: 8,
                 filled: true,
                 fillColor: Colors.white,
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                hintText: "Descripcion de la tarea"),
+                hintText: AppTexts.taskListModalInputDescription),
           ),
           SizedBox(
             height: 26,
@@ -131,15 +135,12 @@ class _NewTaskModalState extends State<_NewTaskModal> {
                 final taskTitle = _controller.text.trim();
                 var uuid = Uuid();
                 if (taskTitle.isNotEmpty) {
-                  String timeStamp = widget.editTask?.date ?? DateTime.timestamp().toString();
+                  String timeStamp =
+                      widget.editTask?.date ?? DateTime.timestamp().toString();
                   bool status = widget.editTask?.done ?? false;
                   String id = widget.editTask?.id ?? uuid.v4();
-                  final newTask = Task(
-                    timeStamp,
-                    taskTitle,
-                    done: status,
-                    id: id
-                  );
+                  final newTask =
+                      Task(timeStamp, taskTitle, done: status, id: id);
 
                   if (widget.editTask == null) {
                     context.read<TaskProvider>().addTask(newTask);
@@ -152,7 +153,7 @@ class _NewTaskModalState extends State<_NewTaskModal> {
                   Navigator.of(context).pop();
                 }
               },
-              child: Text('Guardar'))
+              child: Text(AppTexts.taskListModalButton))
         ],
       ),
     );
@@ -171,9 +172,8 @@ class _TaskList extends StatelessWidget {
   }
 
   void updateNoteCheck(String id, bool check) async {
-      await notesService.updateNoteDone(id, check);
+    await notesService.updateNoteDone(id, check);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -182,33 +182,32 @@ class _TaskList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TitleTaskList(text: "Tareas"),
+          TitleTaskList(text: AppTexts.taskListBody),
           Expanded(
             child: Consumer<TaskProvider>(
               builder: (_, provider, __) {
                 if (provider.taskList.isEmpty) {
                   return Center(
-                    child: Text('No hay tareas'),
+                    child: Text(AppTexts.taskListEmpty),
                   );
                 }
 
                 return ListView.separated(
                     itemBuilder: (_, index) => _taskItem(
-                          task: provider.taskList[index],
-                          onTap: (_)  async{
-                            provider.onTaskDoneChange(provider.taskList[index]);
-                            print("Click");
-                            updateNoteCheck(provider.taskList[index].id, provider.taskList[index].done);
-                          },
-                          onDelete: () {
-                            provider.deleteTask(provider.taskList[index]);
-                            deleteNote(provider.taskList[index].id);
-
-                          },
-                          onEdit: () {
-                            _showNewTaskModal(context, editTask: provider.taskList[index]);
-                          }
-                        ),
+                        task: provider.taskList[index],
+                        onTap: (_) async {
+                          provider.onTaskDoneChange(provider.taskList[index]);
+                          updateNoteCheck(provider.taskList[index].id,
+                              provider.taskList[index].done);
+                        },
+                        onDelete: () {
+                          provider.deleteTask(provider.taskList[index]);
+                          deleteNote(provider.taskList[index].id);
+                        },
+                        onEdit: () {
+                          _showNewTaskModal(context,
+                              editTask: provider.taskList[index]);
+                        }),
                     separatorBuilder: (_, __) => const SizedBox(
                           height: 16,
                         ),
@@ -238,7 +237,7 @@ class _Header extends StatelessWidget {
           Row(
             children: [
               ImagesTaskList(
-                nameImages: "shape",
+                nameImages: AppImages.shape,
                 imageWidth: 141,
                 imageHeight: 129,
               ),
@@ -250,7 +249,7 @@ class _Header extends StatelessWidget {
                 height: 100,
               ),
               ImagesTaskList(
-                nameImages: "tasks-list-image",
+                nameImages: AppImages.taskList,
                 imageWidth: 120,
                 imageHeight: 120,
               ),
@@ -258,7 +257,7 @@ class _Header extends StatelessWidget {
                 height: 16,
               ),
               TitleTaskList(
-                text: "Completa tus tareas",
+                text: AppTexts.taskListHeader,
                 color: Colors.white,
               ),
               SizedBox(
