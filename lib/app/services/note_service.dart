@@ -6,20 +6,31 @@ class NotesService {
   final CollectionReference notesCollection =
   FirebaseFirestore.instance.collection('notes');
 
-  Future<void> addNote(String id, String title, bool statusCheck, String date) async {
-    await notesCollection.doc(id).set({
-      'title': title,
-      'done': statusCheck,
-      'date': date
-    });
+  Future<bool> addNote(String id, String title, bool statusCheck, String date) async {
+    try{
+      await notesCollection.doc(id).set({
+        'title': title,
+        'done': statusCheck,
+        'date': date
+      });
+      return true;
+    }catch(e){
+      print(e.toString());
+      return false;
+    }
   }
 
   Future<void> updateNoteDone(String id, bool done) async {
     await notesCollection.doc(id).update({"done": done});
   }
 
-  Future<void> deleteNote(String id) async {
-    await notesCollection.doc(id).delete();
+  Future<bool> deleteNote(String id) async {
+    try{
+      await notesCollection.doc(id).delete();
+      return true;
+    }catch(e){
+      return false;
+    }
   }
 
   Future<List<Task>> getNotes() async {

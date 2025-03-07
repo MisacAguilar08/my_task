@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
@@ -8,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../services/note_service.dart';
 import '../../widgtes/images_task_list.dart';
+import 'offline_sync_provider.dart';
 
 class TaskList extends StatefulWidget {
   const TaskList({super.key});
@@ -79,6 +83,8 @@ class _NewTaskModalState extends State<_NewTaskModal> {
   final NotesService notesService = NotesService();
   late TextEditingController _controller;
 
+  bool isSave = false;
+
   @override
   void initState() {
     super.initState();
@@ -87,10 +93,10 @@ class _NewTaskModalState extends State<_NewTaskModal> {
     );
   }
 
-  void addNote(String id, String date, bool statusDone) async {
+  Future<void> addNote(String id, String date, bool statusDone) async {
     String title = _controller.text;
     if (title.isNotEmpty) {
-      await notesService.addNote(id, title, statusDone, date);
+      isSave = await notesService.addNote(id, title, statusDone, date);
       _controller.clear();
     }
   }
@@ -131,7 +137,7 @@ class _NewTaskModalState extends State<_NewTaskModal> {
             height: 26,
           ),
           ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final taskTitle = _controller.text.trim();
                 var uuid = Uuid();
                 if (taskTitle.isNotEmpty) {
@@ -143,11 +149,18 @@ class _NewTaskModalState extends State<_NewTaskModal> {
                       Task(timeStamp, taskTitle, done: status, id: id);
 
                   if (widget.editTask == null) {
+                    await addNote(id, timeStamp, status);
                     context.read<TaskProvider>().addTask(newTask);
-                    addNote(id, timeStamp, status);
                   } else {
                     context.read<TaskProvider>().editTask(newTask);
-                    addNote(id, timeStamp, status);
+                    await addNote(id, timeStamp, status);
+                  }
+
+                  if (!isSave) {
+                    context
+                        .read<OfflineSyncProvider>()
+                        .addPendingOperation("create", newTask);
+                    isSave = false;
                   }
 
                   Navigator.of(context).pop();
@@ -162,13 +175,13 @@ class _NewTaskModalState extends State<_NewTaskModal> {
 
 class _TaskList extends StatelessWidget {
   final NotesService notesService = NotesService();
-
+  late bool isDelete = false;
   _TaskList({
     super.key,
   });
 
-  void deleteNote(String id) async {
-    await notesService.deleteNote(id);
+  Future<void> deleteNote(String id) async {
+    isDelete = await notesService.deleteNote(id);
   }
 
   void updateNoteCheck(String id, bool check) async {
@@ -200,9 +213,17 @@ class _TaskList extends StatelessWidget {
                           updateNoteCheck(provider.taskList[index].id,
                               provider.taskList[index].done);
                         },
-                        onDelete: () {
+                        onDelete: () async {
+                          Task idTemporal = provider.taskList[index];
                           provider.deleteTask(provider.taskList[index]);
-                          deleteNote(provider.taskList[index].id);
+                          await deleteNote(provider.taskList[index].id);
+                          if (!isDelete) {
+                            context
+                                .read<OfflineSyncProvider>()
+                                .addPendingOperation(
+                                    "delete", idTemporal);
+                            isDelete = false;
+                          }
                         },
                         onEdit: () {
                           _showNewTaskModal(context,
