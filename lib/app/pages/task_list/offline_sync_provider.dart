@@ -10,9 +10,7 @@ class OfflineSyncProvider extends ChangeNotifier {
 
   Future<void> fetchPendingTask() async {
     _pendingOperationsList = await offlineSyncRepository.getTasks();
-    print("return:");
     print(_pendingOperationsList);
-    print("enr return");
     notifyListeners();
   }
 
