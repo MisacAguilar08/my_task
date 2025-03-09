@@ -9,10 +9,14 @@ class TaskProvider extends ChangeNotifier{
   final TaskRepository _taskRepository = TaskRepository();
 
   Future<void> fetchTasks() async {
-    // _taskList = await _taskRepository.getTasks();
     try{
-      NotesService notesService = new NotesService();
-      _taskList = await notesService.getNotes();
+      _taskList = await _taskRepository.getTasks();
+      // NotesService notesService = new NotesService();
+      // _taskList = await notesService.getNotes();
+      // if(_taskList.isEmpty){
+      //   _taskList = await _taskRepository.getTasks();
+      // }
+
     }catch(e){
       _taskList = await _taskRepository.getTasks();
     }

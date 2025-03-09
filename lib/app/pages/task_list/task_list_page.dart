@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
@@ -80,7 +81,7 @@ class _NewTaskModal extends StatefulWidget {
 }
 
 class _NewTaskModalState extends State<_NewTaskModal> {
-  final NotesService notesService = NotesService();
+  // final NotesService notesService = NotesService();
   late TextEditingController _controller;
 
   bool isSave = false;
@@ -93,13 +94,15 @@ class _NewTaskModalState extends State<_NewTaskModal> {
     );
   }
 
-  Future<void> addNote(String id, String date, bool statusDone) async {
-    String title = _controller.text;
-    if (title.isNotEmpty) {
-      isSave = await notesService.addNote(id, title, statusDone, date);
-      _controller.clear();
-    }
-  }
+  // Future<void> addNote(String id, String date, bool statusDone) async {
+  //     String title = _controller.text;
+  //     if (title.isNotEmpty) {
+  //       isSave = await notesService.addNote(id, title, statusDone, date);
+  //       _controller.clear();
+  //     }
+  //
+  //
+  // }
 
   @override
   void dispose() {
@@ -138,33 +141,39 @@ class _NewTaskModalState extends State<_NewTaskModal> {
           ),
           ElevatedButton(
               onPressed: () async {
-                final taskTitle = _controller.text.trim();
-                var uuid = Uuid();
-                if (taskTitle.isNotEmpty) {
-                  String timeStamp =
-                      widget.editTask?.date ?? DateTime.timestamp().toString();
-                  bool status = widget.editTask?.done ?? false;
-                  String id = widget.editTask?.id ?? uuid.v4();
-                  final newTask =
-                      Task(timeStamp, taskTitle, done: status, id: id);
+                try{
+                  final taskTitle = _controller.text.trim();
+                  var uuid = Uuid();
+                  if (taskTitle.isNotEmpty) {
+                    String timeStamp =
+                        widget.editTask?.date ?? DateTime.timestamp().toString();
+                    bool status = widget.editTask?.done ?? false;
+                    String id = widget.editTask?.id ?? uuid.v4();
+                    final newTask =
+                    Task(timeStamp, taskTitle, done: status, id: id);
 
-                  if (widget.editTask == null) {
-                    await addNote(id, timeStamp, status);
-                    context.read<TaskProvider>().addTask(newTask);
-                  } else {
-                    context.read<TaskProvider>().editTask(newTask);
-                    await addNote(id, timeStamp, status);
+                    if (widget.editTask == null) {
+                      // await addNote(id, timeStamp, status);
+                      context.read<TaskProvider>().addTask(newTask);
+
+                    } else {
+                      context.read<TaskProvider>().editTask(newTask);
+                      // await addNote(id, timeStamp, status);
+                    }
+
+                    if (!isSave) {
+                      context
+                          .read<OfflineSyncProvider>()
+                          .addPendingOperation("create", newTask);
+                      isSave = false;
+                    }
                   }
-
-                  if (!isSave) {
-                    context
-                        .read<OfflineSyncProvider>()
-                        .addPendingOperation("create", newTask);
-                    isSave = false;
-                  }
-
+                  Navigator.of(context).pop();
+                }catch(e){
                   Navigator.of(context).pop();
                 }
+
+
               },
               child: Text(AppTexts.taskListModalButton))
         ],
@@ -174,19 +183,19 @@ class _NewTaskModalState extends State<_NewTaskModal> {
 }
 
 class _TaskList extends StatelessWidget {
-  final NotesService notesService = NotesService();
+  // final NotesService notesService = NotesService();
   late bool isDelete = false;
   _TaskList({
     super.key,
   });
 
-  Future<void> deleteNote(String id) async {
-    isDelete = await notesService.deleteNote(id);
-  }
-
-  void updateNoteCheck(String id, bool check) async {
-    await notesService.updateNoteDone(id, check);
-  }
+  // Future<void> deleteNote(String id) async {
+  //   isDelete = await notesService.deleteNote(id);
+  // }
+  //
+  // void updateNoteCheck(String id, bool check) async {
+  //   await notesService.updateNoteDone(id, check);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -210,17 +219,17 @@ class _TaskList extends StatelessWidget {
                         task: provider.taskList[index],
                         onTap: (_) async {
                           provider.onTaskDoneChange(provider.taskList[index]);
-                          updateNoteCheck(provider.taskList[index].id,
-                              provider.taskList[index].done);
+                          // updateNoteCheck(provider.taskList[index].id,
+                          //     provider.taskList[index].done);
                         },
                         onDelete: () async {
                           Task idTemporal = provider.taskList[index];
                           provider.deleteTask(provider.taskList[index]);
-                          await deleteNote(provider.taskList[index].id);
+                          // await deleteNote(provider.taskList[index].id);
                           if (!isDelete) {
                             context
                                 .read<OfflineSyncProvider>()
-                                .addPendingOperation(
+                                .deletePendingOperation(
                                     "delete", idTemporal);
                             isDelete = false;
                           }

@@ -1,13 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../model/task.dart';
 
 class NotesService {
   final CollectionReference notesCollection =
-  FirebaseFirestore.instance.collection('notes');
+  FirebaseFirestore.instance.collection('task');
 
   Future<bool> addNote(String id, String title, bool statusCheck, String date) async {
     try{
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult[0] == ConnectivityResult.none) {
+        print('Sin conexión a internet, no se hará ninguna llamada.');
+        return false;
+      }
+
       await notesCollection.doc(id).set({
         'title': title,
         'done': statusCheck,
@@ -26,6 +33,12 @@ class NotesService {
 
   Future<bool> deleteNote(String id) async {
     try{
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult[0] == ConnectivityResult.none) {
+        print('Sin conexión a internet, no se hará ninguna llamada.');
+        return false;
+      }
+
       await notesCollection.doc(id).delete();
       return true;
     }catch(e){

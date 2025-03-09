@@ -10,6 +10,7 @@ class OfflineSyncProvider extends ChangeNotifier {
 
   Future<void> fetchPendingTask() async {
     _pendingOperationsList = await offlineSyncRepository.getTasks();
+    print("fetch get pending");
     print(_pendingOperationsList);
     notifyListeners();
   }
@@ -22,7 +23,11 @@ class OfflineSyncProvider extends ChangeNotifier {
     fetchPendingTask();
   }
 
-
+  void deletePendingOperation(String type, Task task) {
+    offlineSyncRepository
+        .deleteTask(task.id );
+    fetchPendingTask();
+  }
 
   void clearOperations() {
     _pendingOperationsList.clear();

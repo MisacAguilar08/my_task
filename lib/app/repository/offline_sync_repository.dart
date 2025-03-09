@@ -24,10 +24,19 @@ class OfflineSyncRepository{
     return prefs.setStringList('pendingTask', jsonPendingTasks);
   }
 
-  Future<bool> deleteTask(OfflineSyncTask task) async{
+  Future<bool> deleteTask(String id) async{
     final prefs = await SharedPreferences.getInstance();
     final jsonTasks = prefs.getStringList('pendingTask') ?? [];
-    jsonTasks.remove(jsonEncode(task.toJson()));
-    return prefs.setStringList('pendingTask', jsonTasks);
+    // jsonTasks.remove(jsonEncode(task.toJson()));
+    // return prefs.setStringList('pendingTask', jsonTasks);
+    // Decodificar las tareas a una lista de mapas
+    final tasks = jsonTasks.map((task) => json.decode(task) as Map<String, dynamic>).toList();
+
+    // Buscar y eliminar la tarea con el id especificado
+    tasks.removeWhere((task) => task['id'] == id);
+
+    // Volver a codificar la lista a JSON y guardarla
+    final updatedJsonTasks = tasks.map((task) => json.encode(task)).toList();
+    return  prefs.setStringList('pendingTask', updatedJsonTasks);
   }
 }
