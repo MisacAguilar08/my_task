@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:my_task/app/pages/task_list/offline_sync_provider.dart';
+import 'package:my_task/app/pages/task_list/task_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'app/app.dart';
@@ -41,7 +42,8 @@ void main() async {
 
 
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => OfflineSyncProvider()),
+    // ChangeNotifierProvider(create: (_) => OfflineSyncProvider()),
+    ChangeNotifierProvider(create: (_) => TaskProvider()..fetchTasks()),
   ],
   child: MyApp(),));
 }

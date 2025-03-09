@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
+import 'package:my_task/app/pages/task_page/task_page.dart';
 import 'package:my_task/app/utils/app_images.dart';
 import 'package:my_task/app/utils/app_texts.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
@@ -23,20 +24,31 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    taskProvider.fetchTasks();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TaskProvider()..fetchTasks(),
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _Header(),
-            Expanded(child: _TaskList()),
-          ],
-        ),
-        floatingActionButton: buildModalTaskList(),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          _Header(),
+          Expanded(child: _TaskList()),
+        ],
       ),
+      floatingActionButton: buildModalTaskList(),
     );
   }
 
@@ -45,8 +57,11 @@ class _TaskListState extends State<TaskList> {
         builder: (context) => SizedBox(
               width: 45,
               height: 45,
-              child: FloatingActionButton(
-                onPressed: () => _showNewTaskModal(context),
+              child:
+              FloatingActionButton(
+                onPressed: () =>    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                  return TaskPage();
+                })),//_showNewTaskModal(context),
                 child: Icon(Icons.add),
               ),
             ));
@@ -226,17 +241,21 @@ class _TaskList extends StatelessWidget {
                           Task idTemporal = provider.taskList[index];
                           provider.deleteTask(provider.taskList[index]);
                           // await deleteNote(provider.taskList[index].id);
-                          if (!isDelete) {
-                            context
-                                .read<OfflineSyncProvider>()
-                                .deletePendingOperation(
-                                    "delete", idTemporal);
-                            isDelete = false;
-                          }
+                          // if (!isDelete) {
+                          //   context
+                          //       .read<OfflineSyncProvider>()
+                          //       .deletePendingOperation(
+                          //           "delete", idTemporal);
+                          //   isDelete = false;
+                          // }
                         },
                         onEdit: () {
-                          _showNewTaskModal(context,
-                              editTask: provider.taskList[index]);
+                          // _showNewTaskModal(context,
+                          //     editTask: provider.taskList[index]);
+
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                            return TaskPage(task: provider.taskList[index],);
+                          }));
                         }),
                     separatorBuilder: (_, __) => const SizedBox(
                           height: 16,
