@@ -12,9 +12,6 @@ class TaskPage extends StatelessWidget {
   final Task? task;
   TaskPage({super.key, this.task});
 
-
-
-
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller = TextEditingController(
@@ -33,12 +30,11 @@ class TaskPage extends StatelessWidget {
           String id = task?.id ?? uuid.v4();
           final newTask = Task(timeStamp, taskTitle, done: status, id: id);
 
-          if(task == null){
+          if (task == null) {
             taskProvider.addTask(newTask);
-          }else{
+          } else {
             taskProvider.editTask(newTask);
           }
-
         }
       } catch (e) {}
     }
@@ -53,13 +49,34 @@ class TaskPage extends StatelessWidget {
       child: Scaffold(
         primary: true,
         appBar: AppBar(
-            // leading: IconButton(
-            //     onPressed: () {
-            //       Navigator.of(context).pop();
-            //
-            //     },
-            //     icon: Icon(Icons.arrow_back)),
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.save_as)),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.notifications),
+              onPressed: () {
+
+              },
             ),
+            PopupMenuButton<String>(
+              onSelected: (value) {
+
+              },
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(
+                    value: 'Eliminar',
+                    child: Text('Eliminar'),
+                  ),
+                ];
+              },
+            ),
+          ],
+            ),
+
         resizeToAvoidBottomInset: true,
         body: SafeArea(
           child: Column(

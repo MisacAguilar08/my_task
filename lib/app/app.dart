@@ -22,6 +22,12 @@ class MyApp extends StatelessWidget {
             displayColor: textColor),
         bottomSheetTheme:
             BottomSheetThemeData(backgroundColor: Colors.transparent),
+        appBarTheme: AppBarTheme(
+          backgroundColor: primary,
+          iconTheme: IconThemeData(
+            color: backgroundColor,
+          )
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 54),
