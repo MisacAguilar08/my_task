@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_task/app/pages/notification/notification.dart';
 import 'package:my_task/app/pages/splash/splash_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
             ))),
         useMaterial3: true,
       ),
-      home: const SplashPage(),
+      home:  SplashPage(),
     );
   }
 }

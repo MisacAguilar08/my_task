@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../model/task.dart';
+import '../../services/notifications.dart';
 import '../../utils/app_texts.dart';
 import '../task_list/task_list_page.dart';
 import '../task_list/task_provider.dart';
@@ -35,6 +36,9 @@ class TaskPage extends StatelessWidget {
           } else {
             taskProvider.editTask(newTask);
           }
+
+          await scheduleNotification(1);
+          // await cancelNotification(1);
         }
       } catch (e) {}
     }
