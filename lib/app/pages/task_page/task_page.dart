@@ -37,8 +37,8 @@ class TaskPage extends StatelessWidget {
           } else {
             taskProvider.editTask(newTask);
           }
-
-          await notificationService.scheduleNotification(int.parse(id), 5);
+          await notificationService.showInstantNotification("title", "body");
+          await notificationService.scheduleNotification("PRO","Noti",5);
           // await cancelNotification(1);
         }
       } catch (e) {}

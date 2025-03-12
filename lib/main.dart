@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:my_task/app/pages/task_list/offline_sync_provider.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
+import 'package:my_task/app/services/notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -47,14 +48,8 @@ void main() async {
   //   }
   // });
   WidgetsFlutterBinding.ensureInitialized();
-  const AndroidInitializationSettings initializationSettingsAndroid =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  const InitializationSettings initializationSettings =
-  InitializationSettings(android: initializationSettingsAndroid);
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
+  NotificationService ns = NotificationService();
+  await ns.init();
 
   runApp(MultiProvider(providers: [
     // ChangeNotifierProvider(create: (_) => OfflineSyncProvider()),
