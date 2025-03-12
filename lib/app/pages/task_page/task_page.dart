@@ -20,6 +20,7 @@ class TaskPage extends StatelessWidget {
     );
 
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    NotificationService notificationService = new NotificationService();
 
     void addTask() async {
       try {
@@ -37,7 +38,7 @@ class TaskPage extends StatelessWidget {
             taskProvider.editTask(newTask);
           }
 
-          await scheduleNotification(1);
+          await notificationService.scheduleNotification(int.parse(id), 5);
           // await cancelNotification(1);
         }
       } catch (e) {}
