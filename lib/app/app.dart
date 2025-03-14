@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_task/app/pages/splash/splash_page.dart';
+import 'package:my_task/app/pages/task_list/task_list_page.dart';
+import 'package:my_task/app/pages/task_list/task_provider.dart';
+import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -9,7 +12,6 @@ class MyApp extends StatelessWidget {
     const primary = Color(0xFF40B7AD);
     const textColor = Color(0xFF4A4A4A);
     const backgroundColor = Color(0xFFF5F5F5);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

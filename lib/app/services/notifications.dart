@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -29,32 +32,71 @@ class NotificationService {
         ?.requestNotificationsPermission();
   }
 
-  Future<void> showInstantNotification(String title, String body) async {
-    const NotificationDetails plaformChannelSpecifics = NotificationDetails(
-        android: AndroidNotificationDetails("channel_id", "channel_name",
-            importance: Importance.high, priority: Priority.high),
-        iOS: DarwinNotificationDetails());
+  Future<void> showInstantNotification(
+      String body, int minutes, int idNotification,
+      {String title = "Recordatorio"}) async {
+    Timer.periodic(Duration(seconds: minutes), (Timer timer) async {
+      const NotificationDetails plaformChannelSpecifics = NotificationDetails(
+          android: AndroidNotificationDetails("channel_id", "channel_name",
+              importance: Importance.high, priority: Priority.high),
+          iOS: DarwinNotificationDetails());
 
-    await flutterLocalNotificationsPlugin.show(
-        0, title, body, plaformChannelSpecifics);
+      await flutterLocalNotificationsPlugin.show(
+          idNotification, title, body, plaformChannelSpecifics,
+          payload: 'payload');
+    });
   }
 
-  Future<void> scheduleNotification(
-      String title, String body, int scheduleDate) async {
+  Future<void> scheduleNotification(int idNotification,
+      String body, int scheduleDate,  {String title = "Recordatorio"}) async {
+    tz.initializeTimeZones();
     const NotificationDetails plaformChannelSpecifics = NotificationDetails(
         android: AndroidNotificationDetails("channel_id", "channel_name",
             importance: Importance.high, priority: Priority.high),
         iOS: DarwinNotificationDetails());
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
-        1,
+        idNotification,
         title,
         body,
         tz.TZDateTime.now(tz.local).add(Duration(seconds: scheduleDate)),
         plaformChannelSpecifics,
+        matchDateTimeComponents: DateTimeComponents.time,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
+  }
+
+  Future<void> intervalNotification() async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+            'repeating channel id', 'repeating channel name',
+            channelDescription: 'repeating description');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await flutterLocalNotificationsPlugin.periodicallyShow(
+        1,
+        'intervalNotification',
+        'intervalNotification body',
+        RepeatInterval.everyMinute,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
+  }
+
+  Future<void> periodicallyNotification(int idNotification,
+      String body, RepeatInterval scheduleDate,  {String title = "Recordatorio"}) async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+            'repeating channel id', 'repeating channel name',
+            channelDescription: 'repeating description');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await flutterLocalNotificationsPlugin.periodicallyShow(
+        idNotification,
+        title,
+        body,
+        scheduleDate,
+        notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
   }
 
@@ -79,6 +121,7 @@ class NotificationService {
   // }
 
   Future<void> cancelNotification(int id) async {
+    print(id);
     await flutterLocalNotificationsPlugin.cancel(id);
   }
 

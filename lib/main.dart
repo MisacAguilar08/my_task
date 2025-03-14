@@ -7,7 +7,7 @@ import 'package:my_task/app/pages/task_list/offline_sync_provider.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
 import 'package:my_task/app/services/notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'app/app.dart';
 import 'app/services/ConnectivityService.dart';
@@ -50,6 +50,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService ns = NotificationService();
   await ns.init();
+  tz.initializeTimeZones();
 
   runApp(MultiProvider(providers: [
     // ChangeNotifierProvider(create: (_) => OfflineSyncProvider()),

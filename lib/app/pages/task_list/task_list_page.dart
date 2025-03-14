@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
 import 'package:my_task/app/pages/task_page/task_page.dart';
+import 'package:my_task/app/services/notifications.dart';
 import 'package:my_task/app/utils/app_images.dart';
 import 'package:my_task/app/utils/app_texts.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
@@ -240,6 +241,8 @@ class _TaskList extends StatelessWidget {
                         onDelete: () async {
                           Task idTemporal = provider.taskList[index];
                           provider.deleteTask(provider.taskList[index]);
+                          NotificationService ns = new NotificationService();
+                          await ns.cancelNotification(provider.taskList[index].notification);
                           // await deleteNote(provider.taskList[index].id);
                           // if (!isDelete) {
                           //   context
