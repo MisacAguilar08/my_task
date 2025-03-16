@@ -16,9 +16,10 @@ class TaskPage extends StatelessWidget {
   TaskPage({super.key, this.task});
 
   late RepeatInterval repeatInterval;
-
+  late TextEditingController _controller;
   @override
   Widget build(BuildContext context) {
+    print("build");
     TextEditingController _controller = TextEditingController(
       text: task?.title ?? "",
     );
