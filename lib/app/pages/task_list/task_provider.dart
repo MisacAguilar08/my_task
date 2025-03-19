@@ -10,7 +10,6 @@ class TaskProvider extends ChangeNotifier{
 
   Future<void> fetchTasks() async {
     // try{
-      print("Llamada  y Actualizaci'on");
       _taskList = await _taskRepository.getTasks();
       notifyListeners();
       // NotesService notesService = new NotesService();

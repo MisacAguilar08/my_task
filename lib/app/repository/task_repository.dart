@@ -39,8 +39,8 @@ class TaskRepository {
     List<Task> jTask = jsonTasks.map((e) => Task.fromJson(jsonDecode(e))).toList();
     final index = jTask.indexWhere( (item) => item.id == task.id);
     jTask[index].title = task.title;
+    jTask[index].recordatorio = task.recordatorio;
     final encodeTasks = jTask.map((e) => jsonEncode(e.toJson())).toList();
     return prefs.setStringList('tasks', encodeTasks);
-
   }
 }

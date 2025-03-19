@@ -13,6 +13,7 @@ import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../services/note_service.dart';
+import '../../utils/constant.dart';
 import '../../widgtes/images_task_list.dart';
 import 'offline_sync_provider.dart';
 
@@ -58,11 +59,11 @@ class _TaskListState extends State<TaskList> {
         builder: (context) => SizedBox(
               width: 45,
               height: 45,
-              child:
-              FloatingActionButton(
-                onPressed: () =>    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              child: FloatingActionButton(
+                onPressed: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
                   return TaskPage();
-                })),//_showNewTaskModal(context),
+                })), //_showNewTaskModal(context),
                 child: Icon(Icons.add),
               ),
             ));
@@ -157,21 +158,20 @@ class _NewTaskModalState extends State<_NewTaskModal> {
           ),
           ElevatedButton(
               onPressed: () async {
-                try{
+                try {
                   final taskTitle = _controller.text.trim();
                   var uuid = Uuid();
                   if (taskTitle.isNotEmpty) {
-                    String timeStamp =
-                        widget.editTask?.date ?? DateTime.timestamp().toString();
+                    String timeStamp = widget.editTask?.date ??
+                        DateTime.timestamp().toString();
                     bool status = widget.editTask?.done ?? false;
                     String id = widget.editTask?.id ?? uuid.v4();
                     final newTask =
-                    Task(timeStamp, taskTitle, done: status, id: id);
+                        Task(timeStamp, taskTitle, done: status, id: id);
 
                     if (widget.editTask == null) {
                       // await addNote(id, timeStamp, status);
                       context.read<TaskProvider>().addTask(newTask);
-
                     } else {
                       context.read<TaskProvider>().editTask(newTask);
                       // await addNote(id, timeStamp, status);
@@ -185,11 +185,9 @@ class _NewTaskModalState extends State<_NewTaskModal> {
                     }
                   }
                   Navigator.of(context).pop();
-                }catch(e){
+                } catch (e) {
                   Navigator.of(context).pop();
                 }
-
-
               },
               child: Text(AppTexts.taskListModalButton))
         ],
@@ -234,7 +232,24 @@ class _TaskList extends StatelessWidget {
                     itemBuilder: (_, index) => _taskItem(
                         task: provider.taskList[index],
                         onTap: (_) async {
+                          NotificationService ns = NotificationService();
                           provider.onTaskDoneChange(provider.taskList[index]);
+                          if (provider.taskList[index].done) {
+                            await ns.cancelNotification(
+                                provider.taskList[index].notification);
+                          } else {
+                            int keyType = listNotification.entries
+                                .firstWhere((entry) =>
+                                    entry.value ==
+                                    provider.taskList[index].recordatorio)
+                                .key;
+                            if (keyType != 4) {
+                              await ns.periodicallyNotification(
+                                  provider.taskList[index].notification,
+                                  provider.taskList[index].title,
+                                  notificationOption.values.elementAt(keyType));
+                            }
+                          }
                           // updateNoteCheck(provider.taskList[index].id,
                           //     provider.taskList[index].done);
                         },
@@ -242,7 +257,8 @@ class _TaskList extends StatelessWidget {
                           Task idTemporal = provider.taskList[index];
                           provider.deleteTask(provider.taskList[index]);
                           NotificationService ns = new NotificationService();
-                          await ns.cancelNotification(provider.taskList[index].notification);
+                          await ns.cancelNotification(
+                              provider.taskList[index].notification);
                           // await deleteNote(provider.taskList[index].id);
                           // if (!isDelete) {
                           //   context
@@ -256,8 +272,11 @@ class _TaskList extends StatelessWidget {
                           // _showNewTaskModal(context,
                           //     editTask: provider.taskList[index]);
 
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                            return TaskPage(task: provider.taskList[index],);
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return TaskPage(
+                              task: provider.taskList[index],
+                            );
                           }));
                         }),
                     separatorBuilder: (_, __) => const SizedBox(

@@ -9,26 +9,29 @@ import '../../model/task.dart';
 import '../../services/notifications.dart';
 import '../../utils/app_text_style.dart';
 import '../../utils/app_texts.dart';
+import '../../utils/constant.dart';
 import '../task_list/task_provider.dart';
 
 class TaskPage extends StatelessWidget {
   final Task? task;
   TaskPage({super.key, this.task});
 
-  late RepeatInterval repeatInterval;
-  late TextEditingController _controller;
+  late RepeatInterval? repeatInterval = null;
+  int type_notification = 4;
+  late TextEditingController _controller = TextEditingController(
+    text: task?.title ?? "",
+  );
+
+
+
   @override
   Widget build(BuildContext context) {
-    print("build");
-    TextEditingController _controller = TextEditingController(
-      text: task?.title ?? "",
-    );
-
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     NotificationService notificationService = new NotificationService();
 
     void addTask() async {
       try {
+        notificationService.getAllNotification();
         final taskTitle = _controller.text.trim();
         var uuid = Uuid();
         if (taskTitle.isNotEmpty) {
@@ -36,8 +39,17 @@ class TaskPage extends StatelessWidget {
           String timeStamp = task?.date ?? DateTime.timestamp().toString();
           bool status = task?.done ?? false;
           String id = task?.id ?? uuid.v4();
+          type_notification = repeatInterval == null ? 4: repeatInterval!.index;
+
+          String type = ((repeatInterval == null && task?.recordatorio != null)
+              ? task?.recordatorio
+              : listNotification.values.elementAt(type_notification))!;
+
           final newTask = Task(timeStamp, taskTitle,
-              done: status, id: id, notification: idNotification);
+              done: status,
+              id: id,
+              notification: idNotification,
+              recordatorio: type);
 
           if (task == null) {
             taskProvider.addTask(newTask);
@@ -45,10 +57,12 @@ class TaskPage extends StatelessWidget {
             taskProvider.editTask(newTask);
           }
 
-          List<int> index = [0,1,2,3];
-          if (index.contains(repeatInterval.index)) {
+
+          if (type != "none") {
+            int keyType = listNotification.entries.firstWhere( (entry) => entry.value == type).key;
+            await notificationService.cancelNotification(idNotification);
             await notificationService.periodicallyNotification(
-                newTask.notification, newTask.title, repeatInterval);
+                newTask.notification, newTask.title, notificationOption.values.elementAt(keyType));
           }
         }
       } catch (e) {}
@@ -73,6 +87,7 @@ class TaskPage extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.notification_add),
               onPressed: () {
+                FocusScope.of(context).unfocus();
                 _showNotificationModal(context);
               },
             ),
@@ -130,6 +145,7 @@ class TaskPage extends StatelessWidget {
   Widget NotificationOption(BuildContext context) {
     return Container(
       width: double.infinity,
+      height: 280,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.vertical(top: Radius.circular(21)),
           color: Colors.white),

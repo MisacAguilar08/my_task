@@ -128,4 +128,16 @@ class NotificationService {
   Future<void> cancelAllNotification() async {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
+
+  Future<void> getAllNotification() async {
+    List<ActiveNotification> listNotification = await flutterLocalNotificationsPlugin.getActiveNotifications();
+    print("getAllNotification---------------------------");
+    for(ActiveNotification noti in listNotification){
+      print(noti.id);
+      print(noti.title);
+      print(noti.body);
+    }
+    print("end getAllNotification---------------------------");
+
+  }
 }

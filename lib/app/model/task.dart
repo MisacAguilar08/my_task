@@ -1,5 +1,5 @@
 class Task{
-  Task(this.date, this.title, {this.done = false, this.id = "", this.notification = 0});
+  Task(this.date, this.title, {this.done = false, this.id = "", this.notification = 0, this.recordatorio = "none"});
 
   Task.fromJson(Map<String, dynamic> json){
     id= json["id"];
@@ -7,6 +7,7 @@ class Task{
     date= json["date"];
     done= json["done"];
     notification = json["notification"];
+    recordatorio = json["recordatorio"];
   }
 
   late String id;
@@ -14,6 +15,7 @@ class Task{
   late String title;
   late bool done;
   late int notification;
+  late String recordatorio;
 
   Map<String, dynamic> toJson(){
     return{
@@ -21,7 +23,8 @@ class Task{
       "title": title,
       "done": done,
       "date": date,
-      "notification": notification
+      "notification": notification,
+      "recordatorio": recordatorio
     };
   }
 }
