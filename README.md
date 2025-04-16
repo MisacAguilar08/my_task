@@ -1,6 +1,8 @@
 # my_task
 
 Lista de tareas
+Es parte de un curso - se agregaron unas cuantas funcionalidades.
+
 
 ## Getting Started
 
