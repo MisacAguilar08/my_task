@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_task/app/pages/splash/splash_page.dart';
-import 'package:my_task/app/pages/task_list/task_list_page.dart';
-import 'package:my_task/app/pages/task_list/task_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:my_task/app/feature/task/presentation/pages/splash/splash_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -41,7 +38,7 @@ class MyApp extends StatelessWidget {
                     .copyWith(fontSize: 18, fontWeight: FontWeight.w700))),
         useMaterial3: true,
       ),
-      home: SplashPage(),
+      home: Container(),
     );
   }
 }

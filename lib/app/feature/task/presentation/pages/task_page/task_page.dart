@@ -2,16 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../model/task.dart';
-import '../../services/notifications.dart';
-import '../../utils/app_text_style.dart';
-import '../../utils/app_texts.dart';
-import '../../utils/constant.dart';
-import '../task_list/task_provider.dart';
+import '../../../domain/model/task.dart';
+import '../../../../../core/utils/app_text_style.dart';
+import '../../../../../core/utils/app_texts.dart';
+import '../../../../../core/utils/constant.dart';
 
+// ignore: must_be_immutable
 class TaskPage extends StatelessWidget {
   final Task? task;
   TaskPage({super.key, this.task});
@@ -26,12 +24,9 @@ class TaskPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    NotificationService notificationService = new NotificationService();
 
     void addTask() async {
       try {
-        notificationService.getAllNotification();
         final taskTitle = _controller.text.trim();
         var uuid = Uuid();
         if (taskTitle.isNotEmpty) {
@@ -45,25 +40,25 @@ class TaskPage extends StatelessWidget {
               ? task?.recordatorio
               : listNotification.values.elementAt(type_notification))!;
 
-          final newTask = Task(timeStamp, taskTitle,
-              done: status,
-              id: id,
-              notification: idNotification,
-              recordatorio: type);
+          // final newTask = Task(timeStamp, taskTitle,
+          //     done: status,
+          //     id: id,
+          //     notification: idNotification,
+          //     recordatorio: type);
 
-          if (task == null) {
-            taskProvider.addTask(newTask);
-          } else {
-            taskProvider.editTask(newTask);
-          }
+          // if (task == null) {
+          //   taskProvider.addTask(newTask);
+          // } else {
+          //   taskProvider.editTask(newTask);
+          // }
 
 
-          if (type != "none") {
-            int keyType = listNotification.entries.firstWhere( (entry) => entry.value == type).key;
-            await notificationService.cancelNotification(idNotification);
-            await notificationService.periodicallyNotification(
-                newTask.notification, newTask.title, notificationOption.values.elementAt(keyType));
-          }
+          // if (type != "none") {
+          //   int keyType = listNotification.entries.firstWhere( (entry) => entry.value == type).key;
+          //   await notificationService.cancelNotification(idNotification);
+          //   await notificationService.periodicallyNotification(
+          //       newTask.notification, newTask.title, notificationOption.values.elementAt(keyType));
+          // }
         }
       } catch (e) {}
     }

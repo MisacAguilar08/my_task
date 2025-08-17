@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_task/app/pages/task_list/task_list_page.dart';
-import 'package:my_task/app/utils/app_images.dart';
+import 'package:my_task/app/feature/task/presentation/pages/task_list/task_list_page.dart';
+import 'package:my_task/app/core/utils/app_images.dart';
 
-import '../../utils/app_texts.dart';
+import '../../../../../core/utils/app_texts.dart';
 import '../../widgtes/images_task_list.dart';
 import '../../widgtes/title_task_list.dart';
 
