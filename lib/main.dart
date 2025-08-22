@@ -11,7 +11,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'app/app.dart';
 import 'app/services/ConnectivityService.dart';
-import 'firebase_options.dart';
+
 
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
