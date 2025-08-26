@@ -1,21 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:my_task/app/pages/task_list/offline_sync_provider.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
 import 'package:my_task/app/services/notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 import 'app/app.dart';
-import 'app/services/ConnectivityService.dart';
 
-
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
 
 void main() async {
 
@@ -50,7 +40,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService ns = NotificationService();
   await ns.init();
-  tz.initializeTimeZones();
 
   runApp(MultiProvider(providers: [
     // ChangeNotifierProvider(create: (_) => OfflineSyncProvider()),

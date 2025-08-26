@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:my_task/app/repository/task_repository.dart';
 
 import '../../model/task.dart';
-import '../../services/note_service.dart';
 
 class TaskProvider extends ChangeNotifier{
   List<Task> _taskList = [];

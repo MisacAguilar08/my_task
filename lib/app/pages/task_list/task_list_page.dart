@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_task/app/model/task.dart';
 import 'package:my_task/app/pages/task_list/task_provider.dart';
@@ -12,7 +9,6 @@ import 'package:my_task/app/utils/app_texts.dart';
 import 'package:my_task/app/widgtes/title_task_list.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../services/note_service.dart';
 import '../../utils/constant.dart';
 import '../../widgtes/images_task_list.dart';
 import 'offline_sync_provider.dart';
