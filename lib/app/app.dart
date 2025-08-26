@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
                     .copyWith(fontSize: 18, fontWeight: FontWeight.w700))),
         useMaterial3: true,
       ),
-      home: Container(),
+      home: SplashPage(),
     );
   }
 }
