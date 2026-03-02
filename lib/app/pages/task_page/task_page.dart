@@ -12,6 +12,7 @@ import '../../utils/app_texts.dart';
 import '../../utils/constant.dart';
 import '../task_list/task_provider.dart';
 
+// ignore: must_be_immutable
 class TaskPage extends StatelessWidget {
   final Task? task;
   TaskPage({super.key, this.task});

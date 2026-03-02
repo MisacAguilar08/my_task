@@ -23,7 +23,6 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     taskProvider.fetchTasks();
@@ -31,7 +30,6 @@ class _TaskListState extends State<TaskList> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -59,33 +57,16 @@ class _TaskListState extends State<TaskList> {
                 onPressed: () => Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return TaskPage();
-                })), //_showNewTaskModal(context),
+                })),
                 child: Icon(Icons.add),
               ),
             ));
   }
 }
 
-void _showNewTaskModal(BuildContext context, {Task? editTask}) {
-  showModalBottomSheet(
-    isScrollControlled: true,
-    context: context,
-    builder: (_) {
-      return Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom, // Ajuste dinámico
-        ),
-        child: ChangeNotifierProvider.value(
-          value: context.read<TaskProvider>(),
-          child: _NewTaskModal(editTask: editTask),
-        ),
-      );
-    },
-  );
-}
 
 class _NewTaskModal extends StatefulWidget {
-  _NewTaskModal({super.key, this.editTask});
+  _NewTaskModal(this.editTask);
 
   final Task? editTask;
 
@@ -94,7 +75,6 @@ class _NewTaskModal extends StatefulWidget {
 }
 
 class _NewTaskModalState extends State<_NewTaskModal> {
-  // final NotesService notesService = NotesService();
   late TextEditingController _controller;
 
   bool isSave = false;
@@ -106,16 +86,6 @@ class _NewTaskModalState extends State<_NewTaskModal> {
       text: widget.editTask?.title ?? "",
     );
   }
-
-  // Future<void> addNote(String id, String date, bool statusDone) async {
-  //     String title = _controller.text;
-  //     if (title.isNotEmpty) {
-  //       isSave = await notesService.addNote(id, title, statusDone, date);
-  //       _controller.clear();
-  //     }
-  //
-  //
-  // }
 
   @override
   void dispose() {
@@ -192,20 +162,11 @@ class _NewTaskModalState extends State<_NewTaskModal> {
   }
 }
 
+// ignore: must_be_immutable
 class _TaskList extends StatelessWidget {
-  // final NotesService notesService = NotesService();
   late bool isDelete = false;
-  _TaskList({
-    super.key,
-  });
+  _TaskList();
 
-  // Future<void> deleteNote(String id) async {
-  //   isDelete = await notesService.deleteNote(id);
-  // }
-  //
-  // void updateNoteCheck(String id, bool check) async {
-  //   await notesService.updateNoteDone(id, check);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -246,28 +207,14 @@ class _TaskList extends StatelessWidget {
                                   notificationOption.values.elementAt(keyType));
                             }
                           }
-                          // updateNoteCheck(provider.taskList[index].id,
-                          //     provider.taskList[index].done);
                         },
                         onDelete: () async {
-                          Task idTemporal = provider.taskList[index];
                           provider.deleteTask(provider.taskList[index]);
                           NotificationService ns = new NotificationService();
                           await ns.cancelNotification(
                               provider.taskList[index].notification);
-                          // await deleteNote(provider.taskList[index].id);
-                          // if (!isDelete) {
-                          //   context
-                          //       .read<OfflineSyncProvider>()
-                          //       .deletePendingOperation(
-                          //           "delete", idTemporal);
-                          //   isDelete = false;
-                          // }
                         },
                         onEdit: () {
-                          // _showNewTaskModal(context,
-                          //     editTask: provider.taskList[index]);
-
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             return TaskPage(
@@ -289,9 +236,7 @@ class _TaskList extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({
-    super.key,
-  });
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +285,7 @@ class _Header extends StatelessWidget {
 
 class _taskItem extends StatelessWidget {
   const _taskItem(
-      {super.key, required this.task, this.onTap, this.onDelete, this.onEdit});
+      {required this.task, this.onTap, this.onDelete, this.onEdit});
 
   final Task task;
   final ValueChanged? onTap;
